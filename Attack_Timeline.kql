@@ -1,0 +1,10 @@
+let logs = FAILED_RDP_W_GEO_CL_CL
+| extend RawData = tostring(RawData) 
+| parse RawData with * "latitude:" latitude ",longitude:" longitude ",destinationhost:" destinationhost ",username:" username ",sourcehost:" sourcehost ",state:" state ", country:" country ",label:" label ",timestamp:" timestamp
+| where sourcehost != "";
+logs
+| extend timestamp_datetime = todatetime(timestamp)
+| summarize event_count=count(), earliest_time=min(timestamp_datetime), latest_time=max(timestamp_datetime) by sourcehost, state, country
+| extend attack_duration = latest_time - earliest_time
+| project sourcehost, event_count, country, state, earliest_time, latest_time, attack_duration
+| order by earliest_time asc
