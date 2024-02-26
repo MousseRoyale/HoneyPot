@@ -1,0 +1,8 @@
+let logs = FAILED_RDP_W_GEO_CL_CL
+| extend RawData = tostring(RawData) 
+| parse RawData with * "latitude:" latitude ",longitude:" longitude ",destinationhost:" destinationhost ",username:" username ",sourcehost:" sourcehost ",state:" state ", country:" country ",label:" label ",timestamp:" timestamp
+| where sourcehost != "";
+logs
+| summarize event_count=count() by username
+| project username, event_count
+| order by event_count desc
